@@ -1,6 +1,8 @@
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
+vim.g.copilot_no_tab_map = true
+vim.g.copilot_assume_mapped = true
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -16,7 +18,7 @@ vim.g.have_nerd_font = true
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -64,6 +66,9 @@ vim.opt.inccommand = 'split'
 
 -- Wildmenu: vim command completion menu
 vim.opt.wildoptions = 'pum,fuzzy'
+
+-- Popup menu transparency
+vim.opt.pumblend = 5
 
 -- Show which line your cursor is on
 vim.opt.cursorline = true
@@ -196,22 +201,40 @@ require('lazy').setup({
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
+      local wk = require 'which-key'
       require('which-key').setup()
-
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      wk.add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>c_', hidden = true },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>d_', hidden = true },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>r_', hidden = true },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>s_', hidden = true },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>w_', hidden = true },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>t_', hidden = true },
+        { '<leader>h', group = 'Git [H]unk' },
+        { '<leader>h_', hidden = true },
+        -- visual mode
+        { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
       }
+      -- require('which-key').register {
+      --   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+      --   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
+      --   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+      --   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+      --   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      --   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+      --   ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      -- }
       -- visual mode
-      require('which-key').register({
-        ['<leader>h'] = { 'Git [H]unk' },
-      }, { mode = 'v' })
+      -- require('which-key').register({
+      --   ['<leader>h'] = { 'Git [H]unk' },
+      -- }, { mode = 'v' })
     end,
   },
 
@@ -327,12 +350,17 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'VonHeikemen/lsp-zero.nvim',
+    branch = 'v3.x',
+  },
+
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-      'williamboman/mason-lspconfig.nvim',
+      { 'williamboman/mason-lspconfig.nvim', opts = { auto_install = true } },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
@@ -344,6 +372,8 @@ require('lazy').setup({
       { 'folke/neodev.nvim', opts = {} },
     },
     config = function()
+      local lsp_zero = require 'lsp-zero'
+      lsp_zero.extend_lspconfig()
       -- Brief aside: **What is LSP?**
       --
       -- LSP is an initialism you've probably heard, but might not understand what it is.
@@ -619,6 +649,7 @@ require('lazy').setup({
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-cmdline',
+      'hrsh7th/cmp-buffer',
     },
     config = function()
       -- See `:help cmp`
@@ -701,21 +732,24 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'cmd' },
+          { name = 'buffer' },
         },
-        window = {
-          completion = cmp.config.window.bordered(),
-          documentation = cmp.config.window.bordered(),
-        },
+        -- window = {
+        --   completion = cmp.config.window.bordered(),
+        --   documentation = cmp.config.window.bordered(),
+        -- },
+        experimental = { ghost_text = true },
       }
 
       cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done())
 
-      cmp.setup.cmdline({ '/', '?' }, {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = {
-          { name = 'buffer' },
-        },
-      })
+      -- cmp.setup.cmdline({ '/', '?' }, {
+      --   mapping = cmp.mapping.preset.cmdline(),
+      --   sources = {
+      --     { name = 'buffer' },
+      --   },
+      -- })
 
       cmp.setup.cmdline(':', {
         mapping = cmp.mapping.preset.cmdline(),
@@ -734,13 +768,13 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'rebelot/kanagawa.nvim',
+    'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'kanagawa'
+      vim.cmd.colorscheme 'tokyonight-night'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -749,10 +783,11 @@ require('lazy').setup({
 
   -- Colorschemes
   {
-    'folke/tokyonight.nvim',
     'kxzk/Turtles',
+    'rebelot/kanagawa.nvim',
     'sho-87/kanagawa-paper.nvim',
     'catppuccin/nvim',
+    'tiagovla/tokyodark.nvim',
   },
 
   -- Highlight todo, notes, etc in comments

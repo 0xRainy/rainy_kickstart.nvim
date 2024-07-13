@@ -3,5 +3,10 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-  require 'custom.plugins.oil',
+  -- require 'custom.plugins.oil',
+  -- -- require 'custom.plugins.lsp_signature',
+  -- require 'custom.plugins.dropbars',
+  -- require 'custom.plugins.trouble',
+  -- require 'custom.plugins.diffview',
+  -- require 'custom.plugins.copilot',
 }
