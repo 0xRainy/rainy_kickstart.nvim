@@ -581,7 +581,7 @@ require('lazy').setup({
     lazy = false,
     keys = {
       {
-        '<leader>f',
+        '<leader>ff',
         function()
           require('conform').format { async = true, lsp_fallback = true }
         end,
@@ -595,6 +595,9 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
+        if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+          return
+        end
         local disable_filetypes = { c = true, cpp = true }
         return {
           timeout_ms = 500,
@@ -768,13 +771,13 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
+    'projekt0n/github-nvim-theme',
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'github_dark_default'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -784,10 +787,11 @@ require('lazy').setup({
   -- Colorschemes
   {
     'kxzk/Turtles',
-    'rebelot/kanagawa.nvim',
+    'folke/tokyonight.nvim',
     'sho-87/kanagawa-paper.nvim',
-    'catppuccin/nvim',
     'tiagovla/tokyodark.nvim',
+    'rebelot/kanagawa.nvim',
+    'catppuccin/nvim',
   },
 
   -- Highlight todo, notes, etc in comments
@@ -877,7 +881,7 @@ require('lazy').setup({
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

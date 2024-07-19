@@ -5,8 +5,10 @@ return {
     require('diffview').setup {
       keymaps = {
         disable_defaults = false, -- Disable the default keymaps
-        vim.keymap.set('n', '<leader>dO', '<cmd>DiffviewOpen<CR>', { desc = '[D]iffview [O]pen' }),
-        vim.keymap.set('n', '<leader>dC', '<cmd>DiffviewClose<CR>', { desc = '[D]iffview [C]lose' }),
+        vim.keymap.set('n', '<leader>do', '<cmd>DiffviewOpen<CR>', { desc = '[D]iffview [O]pen' }),
+        vim.keymap.set('n', '<leader>dc', '<cmd>DiffviewClose<CR>', { desc = '[D]iffview [C]lose' }),
+        vim.keymap.set('n', '<leader>dh', '<cmd>DiffviewFileHistory %<CR>', { desc = '[D]iffview Current File [H]istory' }),
+        vim.keymap.set('n', '<leader>dH', '<cmd>DiffviewFileHistory %<CR>', { desc = '[D]iffview File [H]istory' }),
         view = {
           -- The `view` bindings are active in the diff buffers, only when the current
           -- tabpage is a Diffview.
